@@ -5,51 +5,33 @@ class SchedulesController extends AppController {
 
     public function calendar($date = null) {
         if (!$date) {
-            $date = date("Y/m/d");
-            //$date = "2018-2-8";
-            echo "本日の日付";
+            $date = date("Y-m-d");
         }
         echo $date;
-          // https://qiita.com/kazu56/items/8b4bb08bef24f552c99e 参照
-        //findBy[カラム名]で取ってこれる
-        //$schedule = $this->Schedule->findByDate($date);
-        // user_idと、dateの一致から取る場合はAndで繋げば可能(Orもできるらしいがどう使うかぴんとこない)
-        $schedule = $this->Schedule->findByUserIdAndDate(1, $date);
-        if (!$schedule) {
-            // ない場合はとりあえずないなりに処理しておく
-            $schedule['Schedule']['date'] = $date;
-            $schedule['Schedule']['created'] = "";
-            $schedule['Schedule']['text'] = "";
-            //throw new NotFoundException(__('Invalid schedule date'));
+
+        if ($this->request->is('post')) {
+            $this->Schedule->create();
+            if ($this->Schedule->save($this->request->data)) {
+                $this->Flash->success(__('Your post has been saved.'));
+                return $this->redirect(array('action' => 'calendar', $this->request->data['Schedule']['date']));
+            }
+            $this->Flash->error(__('Unable to add your post.'));
         }
-        $this->set('schedule',$schedule);
-    }
-/*
-    public function schedule($d = null) {
-    	if (!$d) {
-            throw new NotFoundException(__('Invalid schedule'));
-        }
-        $date =  "2018-2-".$d;
+
         // https://qiita.com/kazu56/items/8b4bb08bef24f552c99e 参照
         //findBy[カラム名]で取ってこれる
-        //$schedule = $this->Schedule->findByDate($date);
+        $schedule = $this->Schedule->findByDate($date);
+        $isUpdate = true;
         // user_idと、dateの一致から取る場合はAndで繋げば可能(Orもできるらしいがどう使うかぴんとこない)
-        $schedule = $this->Schedule->findByUserIdAndDate(1, $date);
+        //$schedule = $this->Schedule->findByUserIdAndDate(1, $date);
         if (!$schedule) {
             // ない場合はとりあえずないなりに処理しておく
             $schedule['Schedule']['date'] = $date;
             $schedule['Schedule']['created'] = "";
             $schedule['Schedule']['text'] = "";
-            //throw new NotFoundException(__('Invalid schedule date'));
+            $isUpdate = false;
         }
-        echo $schedule['Schedule']['date'];
-        $this->set('schedule', $schedule);
-    }
-*/
-    public function schedule($date = null) {
-        if(!$date){
-           throw new NotFoundException(__('とどいてないんやけど'));
-        }
-        $this->redirect(array('action' => 'calendar', $date));
+        $this->set('schedule',$schedule);
+        $this->set('isUpdate',$isUpdate);
     }
 }

@@ -28,14 +28,10 @@
             while (checkdate($m, $d, $y)) {
                 echo "<td>";
                 // 'action' => 'schedule', $d...controllで定義しているscheduleの引数に$dを渡している
-                echo $d;
-                // 一旦封印
-                /*
                 echo $this->Html->link(
-                    //$d,
-                    date("Y/m/d", mktime(0, 0, 0, $m, $d, $y)),
-                    array('controller' => 'schedules', 'action' => 'schedule', date("Y/m/d", mktime(0, 0, 0, $m, $d, $y))));
-                */
+                    $d,
+                    array('controller' => 'schedules', 'action' => 'calendar', date("Y-m-d", mktime(0, 0, 0, $m, $d, $y)))
+                );
                 echo "</td>";
 
                 // 今日が土曜日の場合は…
@@ -60,11 +56,19 @@
 
         
     </table>
-    <table>
     <?php
-        echo $this->Form->create('schedule');
-        echo $this->Form->input('text', array('placeholder' => $schedule['Schedule']['text']));
+        if($isUpdate) {
+            echo "更新やぞ";
+
+        }else{
+            echo "追加やぞ";
+        }
+        echo $this->Form->create();
+        echo $this->Form->input('text',  array('value' => $schedule['Schedule']['text']));// 
+        echo $this->Form->input('date', array('type' => 'hidden', 'value' => $date));
+        if($isUpdate) {
+            echo $this->Form->input('id', array('type' => 'hidden', 'value' => $schedule['Schedule']['id']));
+        }
         echo $this->Form->end('追加（投稿？）');
     ?>
-    </table>
 </html>
